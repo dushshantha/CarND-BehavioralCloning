@@ -44,7 +44,7 @@ Here, I applied the same pre processing steps to the images in the drive.py file
 
 #### 3. Submission code is usable and readable
 
-The model.py file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works. You can find 2 functions that train 2 different model architectures. Here, I experimented with a [Lenet Architecture](http://yann.lecun.com/exdb/lenet/) and [NVIDIA architecture](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/). I also have differnt functions written to handle all the steps in the process I followed. 
+The model.py file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works. You can find 2 functions that train 2 different model architectures. Here, I experimented with a [Lenet Architecture](http://yann.lecun.com/exdb/lenet/) and [NVIDIA architecture](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/). I also have differnt functions written to handle all the steps in the process I followed. I didnt have to use Python generators as I used a 64GB ram machine with a GPU. It was powerful enough to handle the data in memory. 
 
 ### Model Architecture and Training Strategy
 
@@ -123,52 +123,89 @@ Below is an original image example and a flipped image of the same.
 
 #### 1. Solution Design Approach
 
-The overall strategy for deriving a model architecture was to ...
+The overall strategy for deriving a model architecture was to start with Lenet architecture and building up to other model architectures. 
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
+My first step was to use a convolution neural network model similar to the Lenet architecture. I started with the same architecture I used for the traffic sign classification project. The details are explained in the previous section under "1. An appropriate model architecture has been employed" . I thought will be a great starting point for me. This is a quite small architecture that I can use to see quick results in the initial stages of the process. This helped me arrange my training data to cover most of the cases I needed to cover. Lenet didnt perform well in Bends and had hard time recovering from going off the road. part of this was due to unbalanced trainig data as well. I used various recovery data sets collected using the Simulator and also image augmentation to address this issue. 
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
+Although Lenet performed better with these improvements, It wasnt able to complete the whole lap in the autonomous mode. 
 
-To combat the overfitting, I modified the model so that ...
+I then implemented the model Architecture NVIDIA used for thier Self Driving car. [This link](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/) explains the model. Model is explained under "1. An appropriate model architecture has been employed" above. This model performed really well with the same training data as Lenet. 
 
-Then I ... 
+I used 25% Train/Validation split and used MSE as for the loss function. I used 10 Epochs for both model architectures. Lenet model displayed a really low MSE at the end of the 10th epoch but the validation error almost 3 times that. This meens that the model was overfitting. I observed a similar behavior for NVIDIA architecture as well. To combat this, I used below strategies.
 
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
+
+* I used 50% dropout in both models to avoid the overfitting (model.py lines 111 and 134). 
+* I also used 25% split of the training and Validation data. This avoids the overfitting as well. 
+* I also used shuffling t randomize the data.
+
+This reduced the validation error and brought it down closer to the training error. 
+
+I choose the NVIDIA based model as my final model and used to the simulator to drive the car automously with that.
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
-####2. Final Model Architecture
+#### 2. Final Model Architecture
 
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
+the [NVIDIA architecture](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/). Below is the representation of the Architecture (model.py lines 129 - 153). This is the model I used as the final successful model. 
 
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
+| Layer         		|     Description	        					| 
+|:---------------------:|:---------------------------------------------:| 
+| Input         		| 80x320x3 RGB image  							| 
+| Convolution 5x5     	| 1x1 stride, Valid padding, outputs 76x316x24  	|
+| RELU					|												|
+| Max pooling	      	| 2x2 stride,  outputs 38x158x24 				|
+|	Dropout					|	Keep_prob = 0.5											|
+| Convolution 5x5	    | 1x1 stride, Valid padding, outputs 34x154x36								|
+| RELU					|												|
+| Max pooling	      	| 2x2 stride,  outputs 17x77x36 				|
+| Convolution 5x5	    | 1x1 stride, Valid padding, outputs 13x73x48								|
+| RELU					|												|
+| Max pooling	      	| 2x2 stride,  outputs 6x13x48 				|
+| Convolution 3x3	    | 1x1 stride, Valid padding, outputs 4x11x64								|
+| RELU					|												|
+| Convolution 3x3	    | 1x1 stride, Valid padding, outputs 2x9x64							|
+| RELU					|												|
+| Flatten					|Output = 1152												|
+|	Fully connected					|	Output = 1164										|
+|	Fully connected					|	Output = 100|
+|	Fully connected					|	Output = 50										|
+|	Fully connected					|	Output = 10									|
+|	Fully connected					|	Output = 1										|
 
-![alt text][image1]
 
-####3. Creation of the Training Set & Training Process
+#### 3. Creation of the Training Set & Training Process
 
 To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
 
 ![alt text][image2]
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+I also used several recovery data sets. I Drove the car out the road to cross the lane marks and then started recording the recovery back to the center of the road. I used several of these recovery attemps to get enough data. Below images shows the process of recovery
 
 ![alt text][image3]
 ![alt text][image4]
 ![alt text][image5]
 
-Then I repeated this process on track two in order to get more data points.
 
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
+To augment the data sat, I also flipped images and angles thinking that this would balance the data to present both sides of the road. For example, here is an image that has then been flipped:
 
 ![alt text][image6]
 ![alt text][image7]
 
-Etc ....
+I also used left and right camera photos with +/- 0.2 angles from the original angle and added to the trainign set. 
 
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+After the collection process, I had 59850 number of data points. I then preprocessed this data by doing the following.
+I converted the image to BGR and also croped the image to exclude the background from the image. This lets the model pick up feartures on the road. Below examples show before and after cropping. 
+
+![alt text][image6]
+![alt text][image7]
 
 
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
+I finally randomly shuffled the data set and put 25% of the data into a validation set. 
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+Final Training and Validation set data set looks like follows
+Train on 44887 samples
+validate on 14963 samples
+
+I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was 10. I used an adam optimizer so that manually training the learning rate wasn't necessary.
+
+Please see the vedio for autonomous driving of the car.
