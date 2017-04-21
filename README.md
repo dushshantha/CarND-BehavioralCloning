@@ -49,6 +49,49 @@ The model.py file contains the code for training and saving the convolution neur
 ### Model Architecture and Training Strategy
 
 #### 1. An appropriate model architecture has been employed
+Here I experimented with 2 model architectures. The first model I worked with is Lenet (model.py lines 106-123). Below is the model description. This architecture did not perform to the level I needed. Although It recognised the lanes, It didnt work very well with bends. 
+
+| Layer         		|     Description	        					| 
+|:---------------------:|:---------------------------------------------:| 
+| Input         		| 80x320x3 RGB image   							| 
+| Convolution 5x5     	| 1x1 stride, Valid padding, outputs 76x316x6 	|
+| RELU					|												|
+| Max pooling	      	| 2x2 stride, outputs 38x158x6			|
+|	Dropout					|	Keep_prob = 0.5											|
+| Convolution 5x5	    | 1x1 stride, Valid padding, outputs 34x154x16						|
+| RELU					|												|
+| Max pooling	      	| 2x2 stride, outputs 17x77x16 				|
+| Flatten					|Output = 1309												|
+|	Fully connected					|	Output = 120										|
+|	Fully connected					|	Output = 84										|
+|	Fully connected					|	Output = 1										|
+
+
+The 2nd model architecture I used was the [NVIDIA architecture](https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/). Below is the representation of the Architecture (model.py lines 129 - 153). 
+
+| Layer         		|     Description	        					| 
+|:---------------------:|:---------------------------------------------:| 
+| Input         		| 80x320x3 RGB image  							| 
+| Convolution 5x5     	| 1x1 stride, Valid padding, outputs 76x316x24  	|
+| RELU					|												|
+| Max pooling	      	| 2x2 stride,  outputs 38x158x24 				|
+|	Dropout					|	Keep_prob = 0.5											|
+| Convolution 5x5	    | 1x1 stride, Valid padding, outputs 34x154x36								|
+| RELU					|												|
+| Max pooling	      	| 2x2 stride,  outputs 17x77x36 				|
+| Convolution 5x5	    | 1x1 stride, Valid padding, outputs 13x73x48								|
+| RELU					|												|
+| Max pooling	      	| 2x2 stride,  outputs 6x13x48 				|
+| Convolution 3x3	    | 1x1 stride, Valid padding, outputs 4x11x64								|
+| RELU					|												|
+| Convolution 3x3	    | 1x1 stride, Valid padding, outputs 2x9x64							|
+| RELU					|												|
+| Flatten					|Output = 1152												|
+|	Fully connected					|	Output = 1164										|
+|	Fully connected					|	Output = 100|
+|	Fully connected					|	Output = 50										|
+|	Fully connected					|	Output = 10									|
+|	Fully connected					|	Output = 1										|
 
 My model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24) 
 
