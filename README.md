@@ -178,27 +178,27 @@ the [NVIDIA architecture](https://devblogs.nvidia.com/parallelforall/deep-learni
 
 To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
 
-![alt text][image2]
+![alt text][image4]
 
 I also used several recovery data sets. I Drove the car out the road to cross the lane marks and then started recording the recovery back to the center of the road. I used several of these recovery attemps to get enough data. Below images shows the process of recovery
 
-![alt text][image3]
-![alt text][image4]
 ![alt text][image5]
+![alt text][image6]
+![alt text][image7]
 
 
 To augment the data sat, I also flipped images and angles thinking that this would balance the data to present both sides of the road. For example, here is an image that has then been flipped:
 
-![alt text][image6]
-![alt text][image7]
+![alt text][image2]
+![alt text][image3]
 
 I also used left and right camera photos with +/- 0.2 angles from the original angle and added to the trainign set. 
 
 After the collection process, I had 59850 number of data points. I then preprocessed this data by doing the following.
 I converted the image to BGR and also croped the image to exclude the background from the image. This lets the model pick up feartures on the road. Below examples show before and after cropping. 
 
-![alt text][image6]
-![alt text][image7]
+![alt text][image8]
+![alt text][image9]
 
 
 I finally randomly shuffled the data set and put 25% of the data into a validation set. 
